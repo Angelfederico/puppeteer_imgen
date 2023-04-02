@@ -17,29 +17,24 @@ const scrapeLogic = async (res) => {
   try {
     const page = await browser.newPage();
 
-    await page.goto("https://developer.chrome.com/");
+   // Configura la búsqueda en Google Images
+  await page.goto(`https://www.google.com/search?q=${encodeURIComponent(searchTerm)}&tbm=isch&tbs=isz:ex,iszw:${imageWidth},iszh:${imageHeight}`);
+  
+  // Espera a que se carguen las miniaturas de las imágenes
+  await page.waitForSelector('.rg_i');
 
-    // Set screen size
-    await page.setViewport({ width: 1080, height: 1024 });
+  // Hace clic en la primera miniatura de imagen
+  await page.click('.rg_i', { delay: 200 });
 
-    // Type into search box
-    await page.type(".search-box__input", "automate beyond recorder");
+  // Espera a que se cargue la imagen en tamaño completo
+  await page.waitForSelector('.n3VNCb.KAlXId');
 
-    // Wait and click on first result
-    const searchResultSelector = ".search-box__link";
-    await page.waitForSelector(searchResultSelector);
-    await page.click(searchResultSelector);
-
-    // Locate the full title with a unique string
-    const textSelector = await page.waitForSelector(
-      "text/Customize and automate"
-    );
-    const fullTitle = await textSelector.evaluate((el) => el.textContent);
-
-    // Print the full title
-    const logStatement = `The title of this blog post is ${fullTitle}`;
-    console.log(logStatement);
-    res.send(logStatement);
+  // Obtiene la URL de la imagen
+  const imageUrl = await page.evaluate(() => {
+    const img = document.querySelector('.n3VNCb.KAlXId');
+    return img ? img.getAttribute('src') : null;
+  });
+    res.send(imageUrl);
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
