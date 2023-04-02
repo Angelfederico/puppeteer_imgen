@@ -15,6 +15,9 @@ const scrapeLogic = async (res) => {
         : puppeteer.executablePath(),
   });
   try {
+    const searchTerm = 'perritos acostados en la cama  al lado del su dueño negro'; // Término de búsqueda
+const imageWidth = 640; // Ancho de imagen deseado
+const imageHeight = 480; // Altura de imagen deseado
     const page = await browser.newPage();
 
    // Configura la búsqueda en Google Images
